@@ -16,7 +16,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/										# Commented to allow for inclusion when sending to AWS
 lib64/
 parts/
 sdist/
@@ -243,9 +243,9 @@ fabric.properties
 ### VirtualEnv template
 # Virtualenv
 # http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
-[Bb]in
-[Ii]nclude
-[Ll]ib
+# [Bb]in										# Commented to allow for inclusion when sending to AWS
+# [Ii]nclude									# Commented to allow for inclusion when sending to AWS
+# [Ll]ib										# Commented to allow for inclusion when sending to AWS
 [Ll]ib64
 [Ll]ocal
 [Ss]cripts
