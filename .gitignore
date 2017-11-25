@@ -84,9 +84,9 @@ celerybeat-schedule
 # Environments
 .env
 .venv
-env/
-venv/
-ENV/
+# env/										# Commented to allow for inclusion when sending to AWS
+# venv/										# Commented to allow for inclusion when sending to AWS
+# ENV/										# Commented to allow for inclusion when sending to AWS
 env.bak/
 venv.bak/
 
