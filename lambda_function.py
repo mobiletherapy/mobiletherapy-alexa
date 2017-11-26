@@ -71,8 +71,10 @@ class MySubscribeCallback(SubscribeCallback):
 
    def message(self, pubnub, message):
         global wait, x
+
+
         x = (self.microsoftemotionAI(message.message))
-        wait = False
+
         pass
 
 
@@ -90,9 +92,10 @@ def getjoke(x):
         return "hi"
 
 
-def getSuperlative(x):
+def getSuperlative(x, y):
+
     if x > 0.75 and x < 1:
-        return "gi"
+        return ""
     elif x > 0.50 and x < 0.75:
         return "gi"
     elif x > 0.30 and x < 0.50:
@@ -159,15 +162,12 @@ def get_health_status_intent(intent, session):
     global wait
     pubnub.add_listener(MySubscribeCallback())
     pubnub.subscribe().channels('http').execute()
-    while wait:
-
-        pass
-
+    speech_output
     if 'Emotion' in intent['slots']:
         favorite_color = intent['slots']['Emotion']['value']
         session_attributes = {}
         speech_output = "Okay, I have noted your feeling as " + favorite_color\
-                        + " and taken a picture. I will add this to your online log. Your photo analysis concludes that you are " + getSuperlative(x)
+                        + " and taken a picture. I will add this to your online log. HOLD ON FOR A SEC WHILE I'M PROCESSING YOUR image."
 
 
 
@@ -183,12 +183,41 @@ def get_health_status_intent(intent, session):
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
+
+
+
+def get_health_status_bss():
+    session_attributes = {}
+    card_title = "Welcome"
+    should_end_session = False
+    global wait
+    pubnub.add_listener(MySubscribeCallback())
+    pubnub.subscribe().channels('http').execute()
+    speech_output
+    if 'Emotion' in intent['slots']:
+        favorite_color = intent['slots']['Emotion']['value']
+        session_attributes = {}
+        speech_output = "Okay, I got some results for you now Your score is" + str(x)
+
+        reprompt_text = "I didn't quite get that, please repeat!"
+
+        pubnub.publish().channel('photo').message(favorite_color).async(my_publish_callback)
+    else:
+        speech_output = "I'm not sure how you are Emotion. " \
+                        "Please try again."
+        reprompt_text = "I'm not sure what your favorite color is. " \
+                        "Tell me how you feel by saying I feel great."
+    wait = True
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
+
+
 def handle_session_end_request():
     card_title = "Session Ended"
     speech_output = "Thank you for trying the Alexa Skills Kit sample. " \
                     "Have a nice day! "
     # Setting this to true ends the session and exits the skill.
-    should_end_session = True
+    should_end_session = False
     return build_response({}, build_speechlet_response(
         card_title, speech_output, None, should_end_session))
 
