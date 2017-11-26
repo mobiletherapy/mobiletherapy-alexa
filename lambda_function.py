@@ -9,9 +9,9 @@ pnconfig = PNConfiguration()
 pnconfig.subscribe_key = 'sub-c-8187642a-d207-11e7-91cc-2ef9da9e0d0e'
 pnconfig.secure_key = 'sec-c-ODRkZmI4NzUtMmRjZi00Y2M2LWExM2UtMGZhYjM3ZTZlMjUy'
 pnconfig.publish_key = 'pub-c-3f7415bc-3090-4b10-ba90-1e27ee928302'
-
+wait = True
 pubnub = PubNub(pnconfig)
-
+x = 0.0
 def my_publish_callback(envelope, status):
    # Check whether request successfully completed or not
    if not status.is_error():
@@ -30,10 +30,11 @@ class MySubscribeCallback(SubscribeCallback):
            pass  # This event happens when radio / connectivity is lost
 
        elif status.category == PNStatusCategory.PNConnectedCategory:
+           pass
            # Connect event. You can do stuff like publish, and know you’ll get it.
            # Or just use the connected event to confirm you are subscribed for
            # UI / internal notifications, etc
-           pubnub.publish().channel("photo").message("hello!!").async(my_publish_callback)
+         #  pubnub.publish().channel("photo").message("hello!!").async(my_publish_callback)
        elif status.category == PNStatusCategory.PNReconnectedCategory:
            pass
            # Happens as part of our regular operation. This event happens when
@@ -66,18 +67,45 @@ class MySubscribeCallback(SubscribeCallback):
             print(e.args)
             return None
 
-            # example = '[{"glossary": {"title": "example glossary","GlossDiv": {"title": "S","GlossList": {"GlossEntry": {"ID": "SGML","SortAs": "SGML","GlossTerm": "Standard Generalized Markup Language","Acronym": "SGML","Abbrev": "ISO 8879:1986","GlossDef": {"para": "A meta-markup language, used to create markup languages such as DocBook.","GlossSeeAlso": ["GML", "XML"]},"GlossSee": "markup"}}}}}]'
-            # happiness = json.loads(data)[0]["scores"]["happiness"]
-            # return happiness
+
 
    def message(self, pubnub, message):
-        print(self.microsoftemotionAI(message.message))
-
+        global wait, x
+        x = (self.microsoftemotionAI(message.message))
+        wait = False
         pass
 
-   def message(self, pubnub, message):
-       print(message.message)
-       pass  # Handle new message stored in message.message
+
+def getjoke(x):
+
+    if x > 0.75 and x < 1:
+        return  "hi"
+    elif x > 0.50 and x < 0.75:
+        return "hi"
+    elif x > 0.30 and x < 0.50:
+        return "hi"
+    elif x > 0.10 and x < 0.30:
+        return "hi"
+    else:
+        return "hi"
+
+
+def getSuperlative(x):
+    if x > 0.75 and x < 1:
+        return "gi"
+    elif x > 0.50 and x < 0.75:
+        return "gi"
+    elif x > 0.30 and x < 0.50:
+        return ""
+    elif x > 0.10 and x < 0.30:
+        return "gi"
+    else:
+        return "gi"
+
+def getNegativeEmotion():
+    return ""
+
+
 
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
     return {
@@ -113,6 +141,9 @@ def build_response(session_attributes, speechlet_response):
 def get_welcome_response():
     session_attributes = {}
     card_title = "Welcome"
+
+
+
     speech_output = "Welcome to the Oxford Hackathon Personal Therapist. Tell me how you feel today!"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
@@ -125,14 +156,21 @@ def get_health_status_intent(intent, session):
     session_attributes = {}
     card_title = "Welcome"
     should_end_session = False
-
+    global wait
     pubnub.add_listener(MySubscribeCallback())
     pubnub.subscribe().channels('http').execute()
+    while wait:
+
+        pass
 
     if 'Emotion' in intent['slots']:
         favorite_color = intent['slots']['Emotion']['value']
         session_attributes = {}
-        speech_output = "Okay, I have noted your feeling as " + favorite_color + " and taken a picture. I will add this to your online log."
+        speech_output = "Okay, I have noted your feeling as " + favorite_color\
+                        + " and taken a picture. I will add this to your online log. Your photo analysis concludes that you are " + getSuperlative(x)
+
+
+
         reprompt_text = "I didn't quite get that, please repeat!"
 
         pubnub.publish().channel('photo').message(favorite_color).async(my_publish_callback)
@@ -141,6 +179,7 @@ def get_health_status_intent(intent, session):
                         "Please try again."
         reprompt_text = "I'm not sure what your favorite color is. " \
                         "Tell me how you feel by saying I feel great."
+    wait = True
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
