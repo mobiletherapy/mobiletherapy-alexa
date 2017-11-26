@@ -43,6 +43,38 @@ class MySubscribeCallback(SubscribeCallback):
            # Handle message decryption error. Probably client configured to
            # encrypt messages and on live data feed it received plain text.
 
+   def microsoftemotionAI(self, link):
+        import http.client, urllib.request, urllib.parse, urllib.error, base64, sys, json
+        headers = {
+            'Content-Type': 'application/json',
+            'Ocp-Apim-Subscription-Key': 'a799767c852f4ed1b657ff6f10317984',
+        }
+        params = urllib.parse.urlencode({
+        })
+        # Replace the example URL below with the URL of the image you want to analyze.
+        body = bytearray(("{ 'url': '" + link + "' }"), 'utf-8')
+        try:
+            conn = http.client.HTTPSConnection('westus.api.cognitive.microsoft.com')
+            conn.request("POST", "/emotion/v1.0/recognize?%s" % params, body, headers)
+            response = conn.getresponse()
+            data = response.read()
+            conn.close()
+            # print(data))
+            happiness = json.loads(data.decode('utf-8'))[0]["scores"]["happiness"]
+            return happiness
+        except Exception as e:
+            print(e.args)
+            return None
+
+            # example = '[{"glossary": {"title": "example glossary","GlossDiv": {"title": "S","GlossList": {"GlossEntry": {"ID": "SGML","SortAs": "SGML","GlossTerm": "Standard Generalized Markup Language","Acronym": "SGML","Abbrev": "ISO 8879:1986","GlossDef": {"para": "A meta-markup language, used to create markup languages such as DocBook.","GlossSeeAlso": ["GML", "XML"]},"GlossSee": "markup"}}}}}]'
+            # happiness = json.loads(data)[0]["scores"]["happiness"]
+            # return happiness
+
+   def message(self, pubnub, message):
+        print(self.microsoftemotionAI(message.message))
+
+        pass
+
    def message(self, pubnub, message):
        print(message.message)
        pass  # Handle new message stored in message.message
@@ -93,6 +125,9 @@ def get_health_status_intent(intent, session):
     session_attributes = {}
     card_title = "Welcome"
     should_end_session = False
+
+    pubnub.add_listener(MySubscribeCallback())
+    pubnub.subscribe().channels('http').execute()
 
     if 'Emotion' in intent['slots']:
         favorite_color = intent['slots']['Emotion']['value']
