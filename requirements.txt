@@ -6,4 +6,4 @@ pycryptodomex==3.4.7
 requests==2.18.4
 seashells==0.1.2
 six==1.11.0
-urllib3==1.22
+urllib3==1.26.5
